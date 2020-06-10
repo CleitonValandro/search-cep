@@ -1,2 +1,2 @@
 # search-cep
- Plugin to get the CEP
+ Performing zip search by ViaCep API
