@@ -21,16 +21,47 @@
         <div class="row search-address">
             <div class="col s5">
                 <div class="input-field input-field-cep">
-                    <input placeholder="Informe seu CEP" class="cep" type="text" onkeypress="mascara(this, cep)" maxlength="9">
+                    <input placeholder="Inform your CEP - Ex:00000-000" class="cep" type="text" onkeypress="mascara(this, cep)" maxlength="9">
                     <label for="cep">CEP</label>
                     <span class="helper-text"></span>
                 </div>
             </div>
             <div class="col s2">
-                <a class="waves-effect waves-light btn-large search-address-button">Pesquisar</a>
+                <a class="waves-effect waves-light btn-large search-address-button">
+                    <div class="valueSearch active">Search</div>
+                    <div class="preloader-wrapper small">
+                        <div class="spinner-layer spinner-red-only">
+                            <div class="circle-clipper left">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="gap-patch">
+                                <div class="circle"></div>
+                            </div>
+                            <div class="circle-clipper right">
+                                <div class="circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
+    <div id="tableResult" class="displayInvisible">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+
 
 
     <!--JavaScript at end of body for optimized loading-->

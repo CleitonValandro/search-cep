@@ -2,16 +2,22 @@
     margin-top: 30px;
 }
 
-
-/* temporary definitions - Start */
-
-body {
-    background-color: black;
+#tableResult {
+    padding: 5px;
 }
 
-#search-cep {
-    background-color: rgb(238, 235, 235);
+.active {
+    display: block !important;
 }
 
+.displayInvisible {
+    display: none;
+}
 
-/* temporary definitions - End */
+.preloader-wrapper {
+    margin-top: 9px;
+}
+
+.valueSearch {
+    display: none;
+}
