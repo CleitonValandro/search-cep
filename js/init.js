@@ -1,10 +1,15 @@
 $('#search-cep .search-address-button').click(function(e) {
     e.preventDefault();
+    inputInformation(false);
     var cep = $('#search-cep .cep').val();
-    if (chkCEP(cep)) {
-        alert('Cép é válido');
+    if (cep != "" && cep != null) {
+        if (chkCEP(cep)) {
+            alert(buscaCep(cep));
+        } else {
+            inputInformation("Incorrect CEP")
+        }
     } else {
-        // Create information in the field
+        inputInformation("You must fill this field")
     }
 });
 
@@ -31,3 +36,34 @@ function chkCEP(strCEP) {
     else return false;
 }
 //  CEP Validation - End
+
+//  API via CEP - Start
+function buscaCep(cep) {
+    var url = "https://viacep.com.br/ws/" + cep + "/json/";
+    $.ajax({
+        type: "GET",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        url: url,
+        success: function(response) {
+            return response;
+        },
+        error: function() {
+            return false;
+        }
+    });
+}
+//  API via CEP - End
+
+//  Input error information - Start
+function inputInformation(information) {
+    if (information != false) {
+        $('#search-cep .cep').addClass('invalid');
+        $('#search-cep .input-field-cep span').attr('data-error', information);
+    } else {
+        $('#search-cep .cep').removeClass('invalid');
+        $('#search-cep .input-field-cep span').removeAttr('data-error');
+    }
+
+}
+//  Input error information - End
