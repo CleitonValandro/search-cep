@@ -1,4 +1,4 @@
-$('#search-cep .search-address-button').click(function(e) {
+$('#search-cep .search-cep-button').click(function(e) {
     e.preventDefault();
     inputInformation(false);
     updateTable(false);
@@ -97,7 +97,7 @@ function updateTable(value) {
 jQuery('#search-cep .cep').keypress(function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if (keycode == '13') {
-        $("#search-cep .search-address-button").trigger('click');
+        $("#search-cep .search-cep-button").trigger('click');
     }
 });
 
@@ -110,3 +110,13 @@ function loader(params) {
         $('#search-cep .preloader-wrapper').removeClass('active');
     }
 }
+
+// tab starter
+$(document).ready(function() {
+    $('.tabs').tabs();
+});
+
+// select starter
+$(document).ready(function() {
+    $('select').formSelect();
+});

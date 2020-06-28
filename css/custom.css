@@ -1,4 +1,5 @@
 #search-cep {
+    padding: 5px;
     margin-top: 30px;
 }
 
@@ -20,4 +21,13 @@
 
 .valueSearch {
     display: none;
+}
+
+#search-address .select-dropdown {
+    max-height: 300px;
+}
+
+#search-address .row {
+    padding: 5px;
+    margin-top: 30px;
 }
