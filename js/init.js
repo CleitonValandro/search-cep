@@ -1,74 +1,170 @@
-var state = $('#search-address .select-state select');
-var city = $('#search-address .select-city select');
-var stateSelected = $('#search-address .select-state option:selected').text();
-var CitySelected = $('#search-address .select-city option:selected').text();
-var AddressSelected = $('#search-address .input-address .address').val();
+var cep = $('#search-cep .input-cep');
+var state = $('#search-address .select-state');
+var city = $('#search-address .select-city');
+var street = $('#search-address .input-street');
+
+var cepInput = $('#search-cep .input-cep .cep');
+var stateSelect = $('#search-address .select-state select');
+var citySelect = $('#search-address .select-city select');
+var streetInput = $('#search-address .input-street .street');
 
 // click the button to search by CEP
 $('#search-cep .search-cep-button').click(function(e) {
     e.preventDefault();
-    inputInformation(false);
+    resetInputInformation(cepInput);
     updateTable(false);
-    var cep = $('#search-cep .cep').val();
-    if (cep != "" && cep != null) {
-        if (chkCEP(cep)) {
-            loader(true);
-            buscaCep(cep, function(result) {
-                if (result != false) {
-                    if (result.erro != true) {
-                        $.each(result, function(nameOfElement, valueOfElement) {
-                            if (valueOfElement != "" && valueOfElement != null) {
-                                $("#tableResult tbody").append("<tr><td>" + nameOfElement + "</td><td>" + valueOfElement + "</td></tr>");
-                            }
-                        });
-                        updateTable(true);
-                    } else {
-                        inputInformation("This zip code does not exist");
-                    }
+    if (validadeInputsByCep()) {
+        loader(true);
+        buscaCep(cepInput.val(), function(result) {
+            if (result != false) {
+                if (result.erro != true) {
+                    $.each(result, function(nameOfElement, valueOfElement) {
+                        if (valueOfElement != "" && valueOfElement != null) {
+                            $("#tableResult tbody").append("<tr><td>" + nameOfElement + "</td><td>" + valueOfElement + "</td></tr>");
+                        }
+                    });
+                    updateTable(true);
                 } else {
-                    inputInformation("An error has occurred, please try again");
+                    inputInformationAdress(cepInput, "This zip code does not exist");
                 }
-                loader(false);
-            });
-        } else {
-            inputInformation("Incorrect CEP");
-        }
-    } else {
-        inputInformation("You must fill this field");
+            } else {
+                inputInformationAdress(cepInput,
+                    "An error has occurred, please try again");
+            }
+            loader(false);
+        });
     }
 });
 
+//  Input error information
+function validadeInputsByCep() {
+    if (cepInput.val() == "") {
+        inputInformationAdress(cepInput, 'You must fill this field');
+        return false;
+    } else if (chkCEP(cepInput.val()) == false) {
+        inputInformationAdress(cepInput, 'Incorrect CEP');
+        return false;
+    } else {
+        return true;
+    }
+}
+
 // click the button to search by address
-$('#search-address .search-address-button').click(function(e) {
+$('#search-address .search-street-button').click(function(e) {
     e.preventDefault();
-    inputInformation(false);
     updateTable(false);
+    updateError();
+    if (validadeInputsByAddress() == true) {
+        apiSearchAddress(function(result) {
+            if (result != false) {
+                $.each(result[0], function(nameOfElement, valueOfElement) {
+                    if (valueOfElement != "" && valueOfElement != null) {
+                        $("#tableResult tbody").append("<tr><td>" + nameOfElement + "</td><td>" + valueOfElement + "</td></tr>");
+                    }
+                });
+                updateTable(true);
+            } else {
+                $("#print-error").removeClass('displayInvisible');
+            }
+
+        });
+    }
 });
 
 //Increment select state
-$(state).change(function() {
+$(stateSelect).change(function() {
     if ($(this).val() != false) {
         incrementCity($(this).val(), function(result) {
             if (result != false) {
                 result.sort(function(a, b) {
                     return a.nome.localeCompare(b.nome);
                 });
-                city.formSelect('destroy');
-                city.empty();
-                city.append('<option value="0" selected>Choose your option</option>');
+                citySelect.formSelect('destroy');
+                citySelect.empty();
+                citySelect.append('<option value="0" selected>Choose your option</option>');
                 $.each(result, function(nameOfElement, valueOfElement) {
-                    city.append('<option value="' + valueOfElement.nome + '">' + valueOfElement.nome + '</option>');
+                    citySelect.append('<option value="' + valueOfElement.nome + '">' + valueOfElement.nome + '</option>');
                 });
-                city.removeAttr("disabled");
-                city.formSelect();
+                citySelect.removeAttr("disabled");
+                citySelect.formSelect();
             }
         });
+    } else {
+        citySelect.formSelect('destroy');
+        citySelect.empty();
+        citySelect.append('<option value="0" selected>Choose your option</option>');
+        citySelect.attr('disabled', 'disabled');
+        citySelect.formSelect();
+        resetSelectInformation(city);
     }
 });
+
+// validates inputs by address
+function validadeInputsByAddress() {
+    var valid = false;
+    if (stateSelect.val() <= 0) {
+        selectInformationAdress(state, 'State selection is required');
+        valid = false;
+    } else {
+        resetSelectInformation(state);
+        valid = true;
+    }
+
+    if (citySelect.val() <= 0) {
+        selectInformationAdress(city, 'City selection is required');
+        valid = false;
+    } else {
+        resetSelectInformation(city);
+        valid = true;
+    }
+
+    if (streetInput.val().length >= 200) {
+        inputInformationAdress(streetInput, 'Maximum 200 characters');
+        valid = false;
+    } else if (streetInput.val() == "") {
+        inputInformationAdress(streetInput, 'Street filling is  required');
+        valid = false;
+    } else {
+        resetInputInformation(streetInput);
+        valid = true;
+    }
+    return valid;
+}
+
+//  Input error information
+function inputInformationAdress(object, menssage) {
+    object.addClass('invalid');
+    if (object.nextAll('.helper-text').length == 0) {
+        object.nextAll('.label-input').after('<span class="helper-text" data-error="' + menssage + '"></span>');
+    }
+}
+//  Reset input error information
+function resetInputInformation(object) {
+    object.removeClass('invalid');
+    object.nextAll('span').remove();
+}
+
+//  Select error information
+function selectInformationAdress(object, menssage) {
+    if (!object.find('.select-wrapper').hasClass('disabled')) {
+        object.find('.select-dropdown').addClass('invalid');
+        if (object.find('.select-dropdown').nextAll('.helper-text').length == 0) {
+            object.find('.select-dropdown').nextAll('select').after('<span class="helper-text" data-error="' + menssage + '"></span>');
+        }
+    }
+}
+//  Select input error information
+function resetSelectInformation(object) {
+    if (object.find('.select-dropdown').nextAll('select').length > 0) {
+        object.find('.select-dropdown').removeClass('invalid');
+        object.find('.select-dropdown').nextAll('span').remove();
+    }
+}
 
 //Cleaning the table when changing tabs
 $('#tabs-cep .search-cep').click(function(e) {
     updateTable(false);
+    updateError();
 });
 
 //Cleaning the table when changing tabs and increment select state
@@ -79,11 +175,11 @@ $('#tabs-cep .search-address').click(function(e) {
             result.sort(function(a, b) {
                 return a.nome.localeCompare(b.nome);
             });
-            state.formSelect('destroy');
+            stateSelect.formSelect('destroy');
             $.each(result, function(nameOfElement, valueOfElement) {
-                state.append('<option value="' + valueOfElement.sigla + '">' + valueOfElement.nome + '</option>');
+                stateSelect.append('<option value="' + valueOfElement.sigla + '">' + valueOfElement.nome + '</option>');
             });
-            state.formSelect();
+            stateSelect.formSelect();
         }
     });
 });
@@ -137,6 +233,23 @@ function incrementCity(state, result) {
     });
 }
 
+// API for search by address
+function apiSearchAddress(result) {
+    var url = "https://viacep.com.br/ws/" + stateSelect.val() + "/" + citySelect.val() + "/" + streetInput.val() + "/json/";
+    $.ajax({
+        type: "GET",
+        contentType: "application/json; charset=utf-8",
+        url: url,
+        dataType: "json",
+        success: function(response) {
+            result(response);
+        },
+        error: function() {
+            result(false);
+        }
+    });
+}
+
 // tab starter
 $(document).ready(function() {
     $('.tabs').tabs();
@@ -175,18 +288,11 @@ function updateTable(value) {
     }
 }
 
-
-
-//  Input error information
-function inputInformation(information) {
-    if (information != false) {
-        $('#search-cep .cep').addClass('invalid');
-        $('#search-cep .input-field-cep span').attr('data-error', information);
-    } else {
-        $('#search-cep .cep').removeClass('invalid');
-        $('#search-cep .input-field-cep span').removeAttr('data-error');
+// Clear the error
+function updateError() {
+    if (!$("#print-error").hasClass()) {
+        $("#print-error").addClass('displayInvisible');
     }
-
 }
 
 //  CEP Validation

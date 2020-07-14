@@ -24,10 +24,9 @@
     <div id="search-cep" class="col s12">
         <div class="row">
             <div class="col s5">
-                <div class="input-field input-field-cep">
+                <div class="input-field input-cep">
                     <input placeholder="Inform your CEP - Ex:00000-000" class="cep" type="text" onkeypress="mascara(this, cep)" maxlength="9">
-                    <label for="cep">CEP</label>
-                    <span class="helper-text"></span>
+                    <label class="label-input" for="cep">CEP</label>
                 </div>
             </div>
             <div class="col s2">
@@ -52,37 +51,38 @@
     </div>
     <div id="search-address" class="col s12">
         <div class="row">
-            <div class="col s6 input-field select-state">
+            <div class="col s6 input-field select-state validate">
                 <select>
                       <option value="0" selected>Choose your option</option>
                     </select>
-                <label>Select the state</label>
+                <label class="label-input">Select the state</label>
+
             </div>
             <div class="col s6 input-field select-city">
                 <select disabled>
                       <option value="0" selected>Choose your option</option>
                     </select>
-                <label>Select your city</label>
+                <label class="label-input">Select your city</label>
             </div>
         </div>
         <div class="row">
-            <div class="input-field col s11 input-address">
-                <input placeholder="Placeholder" type="text" class="validate address" disabled>
-                <label for="address">Enter your address</label>
+            <div class="input-field col s11 input-street">
+                <input placeholder="Enter your street" type="text" class="validate street" maxlength="200">
+                <label class="label-input" for="street">Enter your street (street name without the number)</label>
             </div>
-            <div class="col s1">
-                <a class="waves-effect waves-light btn-large search-address-button">
-                    <div class="valueSearch active">Search</div>
-                    <div class="preloader-wrapper small">
-                        <div class="spinner-layer spinner-red-only">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
+            <div class="col s1 ">
+                <a class="waves-effect waves-light btn-large search-street-button ">
+                    <div class="valueSearch active ">Search</div>
+                    <div class="preloader-wrapper small ">
+                        <div class="spinner-layer spinner-red-only ">
+                            <div class="circle-clipper left ">
+                                <div class="circle "></div>
                             </div>
-                            <div class="gap-patch">
-                                <div class="circle"></div>
+                            <div class="gap-patch ">
+                                <div class="circle "></div>
                             </div>
-                            <div class="circle-clipper right">
-                                <div class="circle"></div>
+                            <div class="circle-clipper right ">
+                                <div class="circle "></div>
                             </div>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
             </div>
         </div>
     </div>
-    <div id="tableResult" class="displayInvisible">
+    <div id="tableResult" class="displayInvisible ">
         <table>
             <thead>
                 <tr>
@@ -102,12 +102,15 @@
             </tbody>
         </table>
     </div>
+    <div id="print-error" class="displayInvisible">
+        <h6>Nenhum valor encontrado</h6>
+    </div>
 
     <!--JavaScript at end of body for optimized loading-->
-    <script src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/materialize.min.js"></script>
-    <script src="js/init.js"></script>
-    <script src="js/mask.js"></script>
+    <script src="js/jquery.min.js "></script>
+    <script type="text/javascript " src="js/materialize.min.js "></script>
+    <script src="js/init.js "></script>
+    <script src="js/mask.js "></script>
 </body>
 
 </html>
