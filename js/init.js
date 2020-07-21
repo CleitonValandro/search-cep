@@ -1,3 +1,6 @@
+var searchByCep = $('#search-cep');
+var searchByAddress = $('#search-address');
+
 var cep = $('#search-cep .input-cep');
 var state = $('#search-address .select-state');
 var city = $('#search-address .select-city');
@@ -14,7 +17,7 @@ $('#search-cep .search-cep-button').click(function(e) {
     resetInputInformation(cepInput);
     updateTable(false);
     if (validadeInputsByCep()) {
-        loader(true);
+        loader(searchByCep, true);
         // API for search by CEP
         searchAPI("https://viacep.com.br/ws/" + cepInput.val() + "/json/", function(result) {
             if (result != false) {
@@ -32,7 +35,7 @@ $('#search-cep .search-cep-button').click(function(e) {
                 inputInformationAdress(cepInput,
                     "An error has occurred, please try again");
             }
-            loader(false);
+            loader(searchByCep, false);
         });
     }
 });
@@ -43,6 +46,7 @@ $('#search-address .search-street-button').click(function(e) {
     updateTable(false);
     updateError();
     if (validadeInputsByAddress() == true) {
+        loader(searchByAddress, true);
         // API for search by address
         searchAPI("https://viacep.com.br/ws/" + stateSelect.val() + "/" + citySelect.val() + "/" + streetInput.val() + "/json/", function(result) {
             if (result != false) {
@@ -55,6 +59,7 @@ $('#search-address .search-street-button').click(function(e) {
             } else {
                 $("#print-error").removeClass('displayInvisible');
             }
+            loader(searchByAddress, false);
         });
     }
 });
@@ -209,21 +214,30 @@ $(document).ready(function() {
     $('#search-address select').formSelect();
 });
 
-function loader(params) {
-    if (params) {
-        $('#search-cep .valueSearch').removeClass('active');
-        $('#search-cep .preloader-wrapper').addClass('active');
+// Search button loader effect (search by cep and address)
+function loader(local, status) {
+    if (status) {
+        local.find('.valueSearch').removeClass('active');
+        local.find('.preloader-wrapper').addClass('active');
     } else {
-        $('#search-cep .valueSearch').addClass('active');
-        $('#search-cep .preloader-wrapper').removeClass('active');
+        local.find('.valueSearch').addClass('active');
+        local.find('.preloader-wrapper').removeClass('active');
     }
 }
 
-// Click with enter to search zip code
-jQuery('#search-cep .cep').keypress(function(event) {
+// Click with enter to search by cep
+jQuery(cepInput).keypress(function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if (keycode == '13') {
         $("#search-cep .search-cep-button").trigger('click');
+    }
+});
+
+// Click with enter to search by address
+jQuery(streetInput).keypress(function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+        $("#search-address .search-street-button").trigger('click');
     }
 });
 
