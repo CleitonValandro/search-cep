@@ -15,7 +15,8 @@ $('#search-cep .search-cep-button').click(function(e) {
     updateTable(false);
     if (validadeInputsByCep()) {
         loader(true);
-        buscaCep(cepInput.val(), function(result) {
+        // API for search by CEP
+        searchAPI("https://viacep.com.br/ws/" + cepInput.val() + "/json/", function(result) {
             if (result != false) {
                 if (result.erro != true) {
                     $.each(result, function(nameOfElement, valueOfElement) {
@@ -36,26 +37,14 @@ $('#search-cep .search-cep-button').click(function(e) {
     }
 });
 
-//  Input error information
-function validadeInputsByCep() {
-    if (cepInput.val() == "") {
-        inputInformationAdress(cepInput, 'You must fill this field');
-        return false;
-    } else if (chkCEP(cepInput.val()) == false) {
-        inputInformationAdress(cepInput, 'Incorrect CEP');
-        return false;
-    } else {
-        return true;
-    }
-}
-
 // click the button to search by address
 $('#search-address .search-street-button').click(function(e) {
     e.preventDefault();
     updateTable(false);
     updateError();
     if (validadeInputsByAddress() == true) {
-        apiSearchAddress(function(result) {
+        // API for search by address
+        searchAPI("https://viacep.com.br/ws/" + stateSelect.val() + "/" + citySelect.val() + "/" + streetInput.val() + "/json/", function(result) {
             if (result != false) {
                 $.each(result[0], function(nameOfElement, valueOfElement) {
                     if (valueOfElement != "" && valueOfElement != null) {
@@ -66,15 +55,15 @@ $('#search-address .search-street-button').click(function(e) {
             } else {
                 $("#print-error").removeClass('displayInvisible');
             }
-
         });
     }
 });
 
-//Increment select state
+//Increment select city
 $(stateSelect).change(function() {
     if ($(this).val() != false) {
-        incrementCity($(this).val(), function(result) {
+        // API for search city
+        searchAPI("https://servicodados.ibge.gov.br/api/v1/localidades/estados/" + $(this).val() + "/distritos", function(result) {
             if (result != false) {
                 result.sort(function(a, b) {
                     return a.nome.localeCompare(b.nome);
@@ -98,6 +87,53 @@ $(stateSelect).change(function() {
         resetSelectInformation(city);
     }
 });
+
+//Cleaning the table when changing tabs and increment select state
+$('#tabs-cep .search-address').click(function(e) {
+    updateTable(false);
+    // API for search state
+    searchAPI("https://servicodados.ibge.gov.br/api/v1/localidades/estados", function(result) {
+        if (result != false) {
+            result.sort(function(a, b) {
+                return a.nome.localeCompare(b.nome);
+            });
+            stateSelect.formSelect('destroy');
+            $.each(result, function(nameOfElement, valueOfElement) {
+                stateSelect.append('<option value="' + valueOfElement.sigla + '">' + valueOfElement.nome + '</option>');
+            });
+            stateSelect.formSelect();
+        }
+    });
+});
+
+//API for search CEP, address, state and city
+function searchAPI(url, result) {
+    $.ajax({
+        type: "GET",
+        contentType: "application/json; charset=utf-8",
+        url: url,
+        dataType: "json",
+        success: function(response) {
+            result(response);
+        },
+        error: function() {
+            result(false);
+        }
+    });
+}
+
+//  Input error information
+function validadeInputsByCep() {
+    if (cepInput.val() == "") {
+        inputInformationAdress(cepInput, 'You must fill this field');
+        return false;
+    } else if (chkCEP(cepInput.val()) == false) {
+        inputInformationAdress(cepInput, 'Incorrect CEP');
+        return false;
+    } else {
+        return true;
+    }
+}
 
 // validates inputs by address
 function validadeInputsByAddress() {
@@ -167,96 +203,9 @@ $('#tabs-cep .search-cep').click(function(e) {
     updateError();
 });
 
-//Cleaning the table when changing tabs and increment select state
-$('#tabs-cep .search-address').click(function(e) {
-    updateTable(false);
-    incrementState(function(result) {
-        if (result != false) {
-            result.sort(function(a, b) {
-                return a.nome.localeCompare(b.nome);
-            });
-            stateSelect.formSelect('destroy');
-            $.each(result, function(nameOfElement, valueOfElement) {
-                stateSelect.append('<option value="' + valueOfElement.sigla + '">' + valueOfElement.nome + '</option>');
-            });
-            stateSelect.formSelect();
-        }
-    });
-});
-
-//API for search state
-function incrementState(result) {
-    var urlEstado = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
-    $.ajax({
-        type: "GET",
-        url: urlEstado,
-        dataType: "json",
-        success: function(response) {
-            result(response);
-        },
-        error: function() {
-            result(false);
-        }
-    });
-}
-
-//  API via CEP
-function buscaCep(cep, result) {
-    var url = "https://viacep.com.br/ws/" + cep + "/json/";
-    $.ajax({
-        type: "GET",
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        url: url,
-        success: function(response) {
-            result(response);
-        },
-        error: function() {
-            result(false);
-        }
-    });
-}
-
-// API for search city
-function incrementCity(state, result) {
-    var urlCity = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/" + state + "/distritos";
-    $.ajax({
-        type: "GET",
-        url: urlCity,
-        dataType: "json",
-        success: function(response) {
-            result(response);
-        },
-        error: function() {
-            result(false);
-        }
-    });
-}
-
-// API for search by address
-function apiSearchAddress(result) {
-    var url = "https://viacep.com.br/ws/" + stateSelect.val() + "/" + citySelect.val() + "/" + streetInput.val() + "/json/";
-    $.ajax({
-        type: "GET",
-        contentType: "application/json; charset=utf-8",
-        url: url,
-        dataType: "json",
-        success: function(response) {
-            result(response);
-        },
-        error: function() {
-            result(false);
-        }
-    });
-}
-
-// tab starter
+// tab and select starter
 $(document).ready(function() {
     $('.tabs').tabs();
-});
-
-// select starter
-$(document).ready(function() {
     $('#search-address select').formSelect();
 });
 
